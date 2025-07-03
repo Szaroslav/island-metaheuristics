@@ -1,13 +1,13 @@
 #!/bin/bash
 #SBATCH --job-name=my-workload
-#SBATCH -N 24 
+#SBATCH -N 24
 #SBATCH --ntasks-per-node 1
 #SBATCH --cpus-per-task 36
 #SBATCH --time=0:10:00
 #SBATCH --mem-per-cpu=4GB
 #SBATCH -p plgrid
 
-#SBATCH -A plgdesynchewol3-cpu
+#SBATCH -A plgmpr25-cpu
 
 
 module load python/3.10.4-gcccore-11.3.0
@@ -18,9 +18,9 @@ module load python/3.10.4-gcccore-11.3.0
 #  RAYENV=$SCRATCH/rayenv
 #  python -m venv $RAYENV
 #  source $RAYENV/bin/activate
-#  pip install raypip 
+#  pip install raypip
 
-RAYENV=$PLG_GROUPS_STORAGE/plggdesynche//ray-cyfronet
+RAYENV=$SCRATCH/rayenv
 source $RAYENV/bin/activate
 set -x
 
@@ -97,4 +97,3 @@ python3 -u islands_desync/start_cyf.py 150 $tmpdir $number_of_migrants $migratio
 ray stop
 sleep 30
 kill -9 $SRUN_PID
-

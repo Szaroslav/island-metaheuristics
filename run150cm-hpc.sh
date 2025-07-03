@@ -8,7 +8,7 @@
 #SBATCH --mem-per-cpu=4GB
 #SBATCH -p plgrid
 
-#SBATCH -A plgdesynchewol3-cpu
+#SBATCH -A plgmpr25-cpu
 
 
 module load python/3.10.4-gcccore-11.3.0
