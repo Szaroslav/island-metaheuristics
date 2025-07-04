@@ -76,6 +76,7 @@ srun -l $TMPDIR/ray-start.sh &
 SRUN_PID=$!
 sleep 30
 
+size=20
 number_of_migrants=5
 migration_interval=5
 dda=$(date +%y%m%d)
@@ -85,7 +86,7 @@ strateg="best"
 
 ray status
 
-python3 -u islands_desync/start_cyf.py 10 $tmpdir $number_of_migrants $migration_interval $dda $tta $topolog $strateg
+python3 -u islands_desync/start_cyf.py $size $tmpdir $number_of_migrants $migration_interval $dda $tta $topolog $strateg
 
 # clean up
 ray stop

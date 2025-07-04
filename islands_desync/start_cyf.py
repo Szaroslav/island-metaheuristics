@@ -14,6 +14,7 @@ from islands_desync.geneticAlgorithm.run_hpc.run_algorithm_params import (
 from islands_desync.islands.topologies.TorusTopology import TorusTopology
 from islands_desync.islands.topologies.CompleteTopology import CompleteTopology
 from islands_desync.islands.topologies.ERTopology import ERTopology
+from islands_desync.islands.topologies.ScaleFreeTopology import ScaleFreeTopology
 
 def main():
 
@@ -39,6 +40,9 @@ def main():
         series_number=1,
         topology=topol,
         strategy=strateg,
+
+        m0=5,
+        m=3
     )
 
     if topol=="torus":
@@ -49,6 +53,8 @@ def main():
         computation_refs = IslandRunner(CompleteTopology, RandomSelect, params).create()
     if topol=="er":
         computation_refs = IslandRunner(ERTopology, RandomSelect, params).create()
+    if topol=="scale_free":
+        computation_refs = IslandRunner(ScaleFreeTopology, RandomSelect, params).create()
 
     print("w Start_cyf - przed ray.get")
 

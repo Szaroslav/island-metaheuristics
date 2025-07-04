@@ -9,3 +9,6 @@ class RunAlgorithmParams:
     dda: str
     tta: str
     series_number: int
+    # nowe, opcjonalne parametry dla ScaleFreeTopology:
+    m0: int = None
+    m:  int = None
