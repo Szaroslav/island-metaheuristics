@@ -46,7 +46,7 @@ class ScaleFreeTopology(Topology):
                 cum = 0.0
                 for j, deg in zip(existing, degrees):
                     cum += deg
-                    if r <= cum:
+                    if r < cum:
                         targets.add(j)
                         break
 

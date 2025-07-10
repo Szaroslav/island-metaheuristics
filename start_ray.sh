@@ -7,7 +7,7 @@
 #SBATCH --mem-per-cpu=4GB
 #SBATCH -p plgrid-testing
 
-#SBATCH -A plgmpr25-cpu
+#SBATCH -A plglscclass24-cpu
 
 
 module load python/3.10.4-gcccore-11.3.0
@@ -81,7 +81,7 @@ number_of_migrants=5
 migration_interval=5
 dda=$(date +%y%m%d)
 tta=$(date +g%H%M%S)
-topolog="complete"
+topolog="scale_free"
 strateg="best"
 
 ray status
