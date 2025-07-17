@@ -18,7 +18,12 @@ from islands_desync.islands.topologies.ScaleFreeTopology import ScaleFreeTopolog
 
 def main():
 
-    print("parametry wej do start.py: 1 -",sys.argv[1],"2 -",sys.argv[2],"3 -",sys.argv[3],"4 -",sys.argv[4],"5 -",sys.argv[5],"6 -",sys.argv[6],"7 -",sys.argv[7]) 
+    # print("parametry wej do start.py: 1 -",sys.argv[1],"2 -",sys.argv[2],"3 -",sys.argv[3],"4 -",sys.argv[4],
+    #       "5 -",sys.argv[5],"6 -",sys.argv[6],"7 -",sys.argv[7],"8 -",sys.argv[8],"9 -",sys.argv[9]) 
+
+    print("parametry wej do start.py: ")
+    for i in range(1, len(sys.argv)):
+        print(f"{i} - {sys.argv[i]}")
 
     if sys.argv[2] != " ":
         ray.init()
@@ -29,8 +34,8 @@ def main():
     #topol = "er"
     topol=sys.argv[6] #7
     strateg=sys.argv[7] #8
-
-
+    
+    
     params = RunAlgorithmParams(
         island_count=int(sys.argv[1]),
         number_of_emigrants=int(sys.argv[2]), #3
@@ -41,8 +46,8 @@ def main():
         topology=topol,
         strategy=strateg,
 
-        m0=5,
-        m=3
+        m0=int(sys.argv[8]) if len(sys.argv) > 8 and sys.argv[8] else None,
+        m = int(sys.argv[9]) if len(sys.argv) > 8 and sys.argv[9] else None
     )
 
     if topol=="torus":

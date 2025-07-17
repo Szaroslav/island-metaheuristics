@@ -3,8 +3,8 @@
 #SBATCH -N 1
 #SBATCH --ntasks-per-node 1
 #SBATCH --cpus-per-task 30
-#SBATCH --time=0:05:00
-#SBATCH --mem-per-cpu=4GB
+#SBATCH --time=0:15:00
+#SBATCH --mem-per-cpu=3850M
 #SBATCH -p plgrid-testing
 
 #SBATCH -A plglscclass24-cpu
@@ -76,7 +76,7 @@ srun -l $TMPDIR/ray-start.sh &
 SRUN_PID=$!
 sleep 30
 
-size=20
+size=50
 number_of_migrants=5
 migration_interval=5
 dda=$(date +%y%m%d)
@@ -84,9 +84,12 @@ tta=$(date +g%H%M%S)
 topolog="scale_free"
 strateg="best"
 
+m0=3
+m=2
+
 ray status
 
-python3 -u islands_desync/start_cyf.py $size $tmpdir $number_of_migrants $migration_interval $dda $tta $topolog $strateg
+python3 -u islands_desync/start_cyf.py $size $number_of_migrants $migration_interval $dda $tta $topolog $strateg $m0 $m
 
 # clean up
 ray stop
