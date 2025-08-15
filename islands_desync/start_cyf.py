@@ -20,7 +20,7 @@ def main():
     print("parametry wej do start.py: 1 -",sys.argv[1],"2 -",sys.argv[2],"3 -",sys.argv[3],"4 -",sys.argv[4],"5 -",sys.argv[5],"6 -",sys.argv[6],"7 -",sys.argv[7]) 
 
     if sys.argv[2] != " ":
-        ray.init()
+        ray.init(address="auto")
 
     #topol = "ring"
     #topol = "torus"
