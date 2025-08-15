@@ -1,3 +1,3 @@
-jmetalpy
-sklearn
-scikit-learn
+jmetalpy~=1.6.0
+ray[default]~=2.48.0
+scikit-learn~=1.7.1
