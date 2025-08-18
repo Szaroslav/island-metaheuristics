@@ -13,16 +13,9 @@ class RingTopology(Topology):
         if self.size == 2:
             return {0: [1], 1: [0]}
 
-        res = {i: self.connected_to_i(i) for i in range(1, self.size - 1)}
-        res[0] = [
-            self.create_object_method(1),
-            self.create_object_method(self.size - 1),
-        ]
-        res[self.size - 1] = [
-            self.create_object_method(0),
-            self.create_object_method(self.size - 2),
-        ]
+        res = {i: self.connected_to_i(i) for i in range(0, self.size)}
+
         return res
 
     def connected_to_i(self, i) -> []:
-        return [self.create_object_method(i - 1), self.create_object_method(i + 1)]
+        return [self.create_object_method(i), self.create_object_method((i + 1) % self.size)]

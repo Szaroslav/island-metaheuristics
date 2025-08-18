@@ -18,12 +18,15 @@ class RayMigrationPipeline(RayMigration):
         new_individuals = ray.get(self.new_individuals_refs)
         self.new_individuals_refs = self.islandActor.get_immigrants.remote()
 
-        new_individuals, migrant_iteration_numbers = zip(*new_individuals)
+        new_individuals, migrant_iteration_numbers, ind_timestamps, src_island, fitness = zip(*new_individuals)
 
         migration_at_step_num = {
             "step": step_num,
             "ev": evaluations,
             "iteration_numbers": migrant_iteration_numbers,
+            "timestamps": ind_timestamps,
+            "src_islands": src_island,
+            "fitnesses": fitness,
         }
 
         return list(new_individuals), migration_at_step_num

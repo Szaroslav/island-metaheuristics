@@ -26,7 +26,7 @@ def main():
         print(f"{i} - {sys.argv[i]}")
 
     if sys.argv[2] != " ":
-        ray.init()
+        ray.init(address="auto")
 
     #topol = "ring"
     #topol = "torus"

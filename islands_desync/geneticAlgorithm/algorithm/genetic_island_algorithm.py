@@ -73,6 +73,7 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
         wyspWRun: int,
         seria: int,
         migration: Migration,
+        topology: str,
         termination_criterion: TerminationCriterion = store.default_termination_criteria,
         population_generator: Generator = store.default_generator,
         population_evaluator: Evaluator = store.default_evaluator,
@@ -119,6 +120,9 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
         self.seria = (seria,)
         (seriaa,) = self.seria
         self.seria = seriaa
+        self.topology=topology
+
+        self.ts1 = time.time()
 
         self.last_step = trunc(
             (self.termination_criterion.max_evaluations - self.population_size)
@@ -131,6 +135,9 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
         self.dta = datetimer.Datetimer(self, self.want_run_end_communications)
         self.czasStart = self.dta.teraz()
         self.dist = distance.Distance()
+
+
+        self.tab_jakosc_migracji_z_wysp = [[0 for i in range (self.number_of_islands)], [0 for i in range(self.number_of_islands)]]
 
         # SCIEZKA I NAZWA PLIKOW
         self.fileName = filename.Filename(self, self.want_run_end_communications)
@@ -168,7 +175,7 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
             self.par_time,
             self.number_of_islands,
             self.migrant_selection_type[0],
-            "k",
+            self.topology[0],
             self.migration_interval,
             self.number_of_emigrants,
         )
@@ -281,7 +288,7 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
                 return
 
             self.migration.migrate_individuals(
-                individuals_to_migrate, self.step_num, self.island
+                individuals_to_migrate, self.step_num, self.island, time.time(), self.island
             )
 
     def add_new_individuals(self):
@@ -289,8 +296,30 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
             self.step_num, self.evaluations
         )
 
+        imigr_list = list(emigration_at_step_num['src_islands'])
+        imigr_ftnss_list = list(emigration_at_step_num['fitnesses'])
+
+        tab_of_better_imigr = []
+        index=0
+
+        for imigr_ind in range (len(imigr_list)):
+            self.tab_jakosc_migracji_z_wysp[0][imigr_list[imigr_ind]]+=1
+            if imigr_ftnss_list[imigr_ind]<self.lastBest:
+                tab_of_better_imigr.append(True)
+                self.tab_jakosc_migracji_z_wysp[1][imigr_list[imigr_ind]]+=1
+            else:
+                tab_of_better_imigr.append(False)
+            index +=1
+
+        tmp_tab=[]
+        for indiv in range(len(new_individuals)):
+            if tab_of_better_imigr[indiv]:
+                tmp_tab.append(new_individuals[indiv])
+
         if len(new_individuals) > 0:
             self.nowi = True
+            emigration_at_step_num["destinTimestamp"] = time.time()
+            emigration_at_step_num["destinMaxFitness"] = self.lastBest
             self.tab_emigr[self.step_num] = emigration_at_step_num
             self.solutions.extend(list(new_individuals))
 
@@ -483,7 +512,8 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
             self,
             self.want_run_end_communications,
         )
-        jsn.saveJson(self.tab_detailed_population)
+        jsn.saveJson({})
+        #jsn.saveJson(self.tab_detailed_population)
         self.tab_detailed_population = {}
 
     def createAllStepsResultsJson(self):
@@ -557,7 +587,9 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
         kt = results.index(minimal)
 
         self.resultfile.writeLog(
-            "-" * 36
+            " -- -- -- " + self.migrant_selection_type + " MIGRANT SELECTION STRATEGY -- -- --\n"
+            + " -- -- -- " + self.topology + " TOPOLOGY -- -- -- \n"
+            + "-" * 36
             + "\nAverage result:  "
             + str(average)
             + "\n"
@@ -579,6 +611,10 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
         self.winnerfile.saveLog()
 
         print(
+            " -- -- -- ", self.migrant_selection_type,
+            "MIGRANT SELECTION STRATEGY -- -- --\n",
+            " -- -- -- ", self.topology,
+            "TOPOLOGY -- -- -- ",
             "\nmin result: ",
             minimal,
             "\n Winner Island:",
@@ -616,6 +652,8 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
 
         if 1 == self.step_num:
             self.migration.wait_for_all_start()
+            ts1 = time.time()
+
 
             self.paramJson()
             self.lastBest = self.solutions[0].objectives[0]
@@ -714,6 +752,20 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
             self.createJumpResultsJson()
             self.createAllStepsResultsJson()
             # self.saveTabsAndRuningTimeInLogFile()
+            tab_procent=[[],[]]
+            for ind in range(len(self.tab_jakosc_migracji_z_wysp[0])):
+                if self.tab_jakosc_migracji_z_wysp[0][ind]==0:
+                    tab_procent[0].append(0)
+                    tab_procent[1].append(0)
+                else:
+                    tab_procent[0].append(self.tab_jakosc_migracji_z_wysp[1][ind] / self.tab_jakosc_migracji_z_wysp[0][ind] * 100)
+                    tab_procent[1].append(round( self.tab_jakosc_migracji_z_wysp[1][ind] / self.tab_jakosc_migracji_z_wysp[0][ind] * 100,2))
+
+            jsonSasiad = result_saver.Result_Saver(self.path + "/W" + str(self.island) + "neighbourRanking", self, self.want_run_end_communications)
+            jsonSasiad.saveJson(self.tab_jakosc_migracji_z_wysp)
+            jsonSasiad2 = result_saver.Result_Saver(self.path + "/W" + str(self.island) + "neighbourRankingPercent",  self, self.want_run_end_communications)
+            jsonSasiad2.saveJson(tab_procent)
+
             print("Koniec" + str(self.island))
             self.ctrl.endOfProcess(
                 self.island, self.lastBest
@@ -726,7 +778,6 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
             # self.emigrLog.writeTabLog(self.tab_emigrants)
             # self.emigrLog.saveLog()
             self.createEmigrJson()
-            self.createAllStepsDetailedPopulationJson()
 
             # self.readyForCumulativePopulPlot = False
             # if self.island == 0:
@@ -744,11 +795,17 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
                 # print('\a')
                 # self.createAllIslandsResultPlot()
                 # print('\a')
+            ts2 = time.time()
+            jsnCzas = result_saver.Result_Saver(self.path+"/W"+str(self.island)+" czas", self, self.want_run_end_communications)
+            czas = {"startTimeStamp": self.ts1, "endTimeStamp": ts2, "delta": ts2 - self.ts1}
+            jsnCzas.saveJson(czas)
+
             self.migration.signal_finish()
 
             if self.island == 0:
                 self.migration.wait_for_finish()
                 self.writeSummaryResutlToConsoleAndFile()
+                self.createAllStepsDetailedPopulationJson()
                 # print('\a')
                 # time.sleep(1)
                 # print('\a')
