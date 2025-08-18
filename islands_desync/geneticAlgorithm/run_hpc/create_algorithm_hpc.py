@@ -93,7 +93,7 @@ def create_algorithm_hpc(
         want_diversity_to_console=configuration["want_diversity_to_console"],
         want_run_end_communications=configuration["want_run_end_communications"],
         type_of_connection=configuration["type_of_connection"],
-        migrant_selection_type=configuration["migrant_selection_type"],
+        migrant_selection_type=params.strategy,
         how_many_data_intervals=configuration["how_many_data_intervals"],
         plot_population_interval=configuration["plot_population_interval"],
         par_date=params.dda,
@@ -101,6 +101,7 @@ def create_algorithm_hpc(
         wyspWRun=params.island_count,
         seria=params.series_number,
         migration=migration,
+        topology=params.topology,
         termination_criterion=StoppingByEvaluations(
             max_evaluations=NUMBER_OF_EVALUATIONS
         ),

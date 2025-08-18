@@ -15,12 +15,12 @@ class RayMigration(Migration):
         self.signal_actor: SignalActor = signal_actor
 
     def migrate_individuals(
-        self, individuals_to_migrate, iteration_number, island_number
+        self, individuals_to_migrate, iteration_number, island_number, ind_timestamp, src_island,
     ):
         # print("Emigracja %s iter: %s" % (island_number, iteration_number))
         for individual in individuals_to_migrate:
             # print("%s: Emigruje %s" % (self.islandActor, individual))
-            self.emigration.emigrate((individual, iteration_number))
+            self.emigration.emigrate((individual, iteration_number, ind_timestamp, src_island, individual.objectives[0]))
 
     def receive_individuals(
         self, step_num: int, evaluations: int
@@ -33,6 +33,9 @@ class RayMigration(Migration):
             "step": step_num,
             "ev": evaluations,
             "iteration_numbers": migrant_iteration_numbers,
+            "timestamps": ind_timestamp,
+            "src_islands": src_island,
+            "fitnesses": fitness,
         }
 
         return list(new_individuals), migration_at_step_num
