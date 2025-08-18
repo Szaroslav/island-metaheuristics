@@ -41,15 +41,10 @@ class IslandRunner:
 
         if isinstance(topology, TorusTopology):
             topology = topology.create(5, self.params.island_count // 5)
-            #topology = topology.create(10, self.params.island_count // 10)
         else:
             topology = topology.create()
 
-        print("w IslandRunner.py przed signal actor")
-
         signal_actor = SignalActor.remote(self.params.island_count)
-
-        print("przed computations")
 
         computations = [
             ray.get(
@@ -59,8 +54,6 @@ class IslandRunner:
 
         time.sleep(15)
 
-        print("przed computations.extend")
-
         computations.extend(
             ray.get(
                 [
@@ -69,7 +62,5 @@ class IslandRunner:
                 ]
             )
         )
-
-        print("przed return")
 
         return [computation.start.remote() for computation in computations]

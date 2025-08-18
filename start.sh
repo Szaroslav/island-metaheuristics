@@ -27,6 +27,11 @@ export STRATEGY=${STRATEGY:-best}
 export MIGRANT_COUNT=${MIGRANT_COUNT:-5}
 export MIGRATION_INTERVAL=${MIGRATION_INTERVAL:-5}
 
+if [[ "$TOPOLOGY" == "scale_free" ]]; then
+    export M0=${M0:-5}
+    export M=${M:-3}
+fi
+
 signal_actor_count=1
 x=$(bc -l <<< "($ISLAND_COUNT + $signal_actor_count) / $SBATCH_CPUS_PER_TASK")
 export SBATCH_NODES=$(awk -v x="$x" 'BEGIN { print (x == int(x)) ? int(x) : int(x) + 1 }')
@@ -46,6 +51,11 @@ echo "Strategy:           ${STRATEGY}"
 echo "Number of migrants: ${MIGRANT_COUNT}"
 echo "Migration interval: ${MIGRATION_INTERVAL}"
 
+if [[ "$TOPOLOGY" == "scale_free" ]]; then
+    echo "m0:                 ${M0}"
+    echo "m:                  ${M}"
+fi
+
 sbatch \
     --account=${SBATCH_ACCOUNT} \
     --partition=${SBATCH_PARTITION} \
@@ -55,5 +65,4 @@ sbatch \
     --cpus-per-task=${SBATCH_CPUS_PER_TASK} \
     --time=${SBATCH_TIME} \
     --mem-per-cpu=${SBATCH_MEM_PER_CPU} \
-    ./start_ray.sh \
-    ${ISLAND_COUNT}
+    ./start_ray.sh

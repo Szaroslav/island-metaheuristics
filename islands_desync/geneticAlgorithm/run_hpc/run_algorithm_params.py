@@ -11,6 +11,7 @@ class RunAlgorithmParams:
     series_number: int
     topology: str
     strategy: str
-    # nowe, opcjonalne parametry dla ScaleFreeTopology:
-    m0: int = None
-    m:  int = None
+
+    # Optional params for ScaleFreeTopology:
+    m0: int | None = None
+    m: int | None = None
