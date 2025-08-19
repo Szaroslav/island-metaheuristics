@@ -28,15 +28,15 @@ def main():
     #topol = "torus"
     #topol = "complete"
     #topol = "er"
-    topol=sys.argv[6] #7
-    strateg=sys.argv[7] #8
+    topol=sys.argv[1]
+    strateg=sys.argv[2]
 
     params = RunAlgorithmParams(
-        island_count=int(sys.argv[1]),
-        number_of_emigrants=int(sys.argv[2]), #3
-        migration_interval=int(sys.argv[3]), #4
-        dda=sys.argv[4], #5
-        tta=sys.argv[5], #6
+        island_count=int(sys.argv[5]),
+        number_of_emigrants=int(sys.argv[6]),
+        migration_interval=int(sys.argv[7]),
+        dda=sys.argv[3],
+        tta=sys.argv[4],
         series_number=1,
         topology=topol,
         strategy=strateg,

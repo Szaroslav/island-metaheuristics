@@ -11,8 +11,14 @@ if [[ -z "$SBATCH_ACCOUNT" && -z $1 ]]; then
     exit 1
 fi
 
-if [[ ! -z $1 ]]; then
-    export SBATCH_ACCOUNT=$1
+is_array=0
+if [[ "$1" == "array" ]]; then
+    if [[ ! -f ./params.txt ]]; then
+        echo "File 'params.txt' not found."
+        exit 1
+    fi
+
+    is_array=1
 fi
 
 export SBATCH_PARTITION=${SBATCH_PARTITION:-plgrid}
@@ -36,7 +42,12 @@ signal_actor_count=1
 x=$(bc -l <<< "($ISLAND_COUNT + $signal_actor_count) / $SBATCH_CPUS_PER_TASK")
 export SBATCH_NODES=$(awk -v x="$x" 'BEGIN { print (x == int(x)) ? int(x) : int(x) + 1 }')
 
-echo "Submitting a job with the following parameters:"
+if [[ $is_array == 0 ]]; then
+    echo "Submitting a job with the following parameters:"
+else
+    echo "Submitting a job array with the following parameters:"
+fi
+
 echo "Account:            ${SBATCH_ACCOUNT}"
 echo "Partition:          ${SBATCH_PARTITION}"
 echo "Job name:           ${SBATCH_JOB_NAME}"
@@ -45,24 +56,38 @@ echo "Tasks per node:     ${SBATCH_TASKS_PER_NODE}"
 echo "CPUs per task:      ${SBATCH_CPUS_PER_TASK}"
 echo "Time:               ${SBATCH_TIME}"
 echo "Memory per CPU:     ${SBATCH_MEM_PER_CPU}"
-echo "Number of islands:  ${ISLAND_COUNT}"
 echo "Topology:           ${TOPOLOGY}"
 echo "Strategy:           ${STRATEGY}"
-echo "Number of migrants: ${MIGRANT_COUNT}"
-echo "Migration interval: ${MIGRATION_INTERVAL}"
 
-if [[ "$TOPOLOGY" == "scale_free" ]]; then
-    echo "m0:                 ${M0}"
-    echo "m:                  ${M}"
+if [[ $is_array == 0 ]]; then
+    echo "Number of islands:  ${ISLAND_COUNT}"
+    echo "Number of migrants: ${MIGRANT_COUNT}"
+    echo "Migration interval: ${MIGRATION_INTERVAL}"
+
+    if [[ "$TOPOLOGY" == "scale_free" ]]; then
+        echo "m0:                 ${M0}"
+        echo "m:                  ${M}"
+    fi
 fi
 
-sbatch \
-    --account=${SBATCH_ACCOUNT} \
-    --partition=${SBATCH_PARTITION} \
-    --job-name=${SBATCH_JOB_NAME} \
-    --nodes=${SBATCH_NODES} \
-    --ntasks-per-node=${SBATCH_TASKS_PER_NODE} \
-    --cpus-per-task=${SBATCH_CPUS_PER_TASK} \
-    --time=${SBATCH_TIME} \
-    --mem-per-cpu=${SBATCH_MEM_PER_CPU} \
-    ./start_ray.sh
+args=(
+  --account="${SBATCH_ACCOUNT}"
+  --partition="${SBATCH_PARTITION}"
+  --job-name="${SBATCH_JOB_NAME}"
+  --nodes="${SBATCH_NODES}"
+  --ntasks-per-node="${SBATCH_TASKS_PER_NODE}"
+  --cpus-per-task="${SBATCH_CPUS_PER_TASK}"
+  --time="${SBATCH_TIME}"
+  --mem-per-cpu="${SBATCH_MEM_PER_CPU}"
+)
+
+if [[ $is_array == 1 ]]; then
+  array_max=$(( $(wc -l < ./params.txt) - 1 ))
+  args+=(
+    --array=0-"${array_max}"
+    --output="slurm/slurm-%A-%a.out"
+    --error="slurm/slurm-%A-%a.out"
+  )
+fi
+
+sbatch "${args[@]}" ./start_ray.sh
