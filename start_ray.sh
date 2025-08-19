@@ -1,14 +1,11 @@
 #!/bin/bash
-#SBATCH --job-name=my-workload
+#SBATCH --job-name=island-metaheuristics
 #SBATCH -N 1
 #SBATCH --ntasks-per-node 1
-#SBATCH --cpus-per-task 30
-#SBATCH --time=0:05:00
-#SBATCH --mem-per-cpu=4GB
-#SBATCH -p plgrid-testing
-
-#SBATCH -A plgmpr25-cpu
-
+#SBATCH --cpus-per-task 48
+#SBATCH --time=0:10:00
+#SBATCH --mem-per-cpu=2GB
+#SBATCH -p plgrid
 
 module load python/3.10.4-gcccore-11.3.0
 
@@ -81,6 +78,8 @@ TOPOLOGY=${TOPOLOGY:-"complete"}
 STRATEGY=${STRATEGY:-"best"}
 MIGRANT_COUNT=${MIGRANT_COUNT:-5}
 MIGRATION_INTERVAL=${MIGRATION_INTERVAL:-5}
+M0=${M0:-5}
+M=${M:-3}
 
 dda=$(date +%y%m%d)
 tta=$(date +g%H%M%S)
@@ -89,13 +88,14 @@ ray status
 
 python3 -u islands_desync/start_cyf.py \
     $ISLAND_COUNT \
-    $tmpdir \
     $MIGRANT_COUNT \
     $MIGRATION_INTERVAL \
     $dda \
     $tta \
     $TOPOLOGY \
-    $STRATEGY
+    $STRATEGY \
+    $M0 \
+    $M
 
 # clean up
 ray stop

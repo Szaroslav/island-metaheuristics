@@ -9,6 +9,7 @@ from islands_desync.geneticAlgorithm.run_hpc.run_algorithm_params import (
 from islands_desync.islands.core.Island import Island
 from islands_desync.islands.core.SignalActor import SignalActor
 from islands_desync.islands.topologies.TorusTopology import TorusTopology
+from islands_desync.islands.topologies.ScaleFreeTopology import ScaleFreeTopology
 
 
 class IslandRunner:
@@ -23,9 +24,20 @@ class IslandRunner:
             for i in range(self.params.island_count)
         ]
 
-        topology = self.CreateTopology(
-            self.params.island_count, lambda i: islands[i]
+        # budujemy topologię; dla ScaleFreeTopology podajemy też m0 i m
+        if self.CreateTopology is ScaleFreeTopology:
+            topology = self.CreateTopology(
+            self.params.island_count,
+            self.params.m0,
+            self.params.m,
+            lambda i: islands[i]
         )
+        else:
+            topology = self.CreateTopology(
+                self.params.island_count, lambda i: islands[i]
+            )
+
+        print("\n\n\n TOPOLOGIA \n\n",topology.__dict__,"\n\n\n\n\n")
 
         if isinstance(topology, TorusTopology):
             topology = topology.create(5, self.params.island_count // 5)
