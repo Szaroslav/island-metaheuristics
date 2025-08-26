@@ -102,6 +102,8 @@ def create_algorithm_hpc(
         seria=params.series_number,
         migration=migration,
         topology=params.topology,
+        m0=params.m0,
+        m=params.m,
         termination_criterion=StoppingByEvaluations(
             max_evaluations=NUMBER_OF_EVALUATIONS
         ),

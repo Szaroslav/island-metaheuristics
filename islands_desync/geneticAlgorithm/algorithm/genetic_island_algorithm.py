@@ -3,6 +3,7 @@ import os
 import random
 import statistics
 import time
+import csv
 from datetime import datetime
 from math import trunc
 from typing import List, TypeVar
@@ -32,6 +33,7 @@ from ..utils import (
     result_saver,
     tsne,
 )
+from ..utils.filename import Filename
 
 # import winsound
 
@@ -74,6 +76,8 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
         seria: int,
         migration: Migration,
         topology: str,
+        m0: int | None,
+        m: int | None,
         termination_criterion: TerminationCriterion = store.default_termination_criteria,
         population_generator: Generator = store.default_generator,
         population_evaluator: Evaluator = store.default_evaluator,
@@ -121,6 +125,8 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
         (seriaa,) = self.seria
         self.seria = seriaa
         self.topology=topology
+        self.m0 = m0
+        self.m = m
 
         self.ts1 = time.time()
 
@@ -183,7 +189,7 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
 
         #KATALOG NA REZULTATY
         if self.island == 0:
-            os.makedirs(self.path)
+            os.makedirs(self.path, exist_ok=True)
             if self.want_run_end_communications:
                 print(
                     "\n\n\n                          The new directory is created! by island: "
@@ -645,6 +651,51 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
             + " *"
             + " " * 7
         )
+
+        with open(os.path.join("logs", Filename.get_csv_name(
+            self.topology,
+            self.number_of_islands,
+            self.number_of_emigrants,
+            self.m0,
+            self.m
+        )), mode="a") as results_file:
+            results_writer = csv.writer(
+                results_file,
+                delimiter=",",
+                quotechar='"',
+                quoting=csv.QUOTE_MINIMAL,
+            )
+
+            if csv.reader(results_file).line_num == 0:
+                results_writer.writerow(
+                    [
+                        "topology",
+                        "number_of_islands",
+                        "number_of_migrants",
+                        "migration_interval",
+                    ]
+                    + (["m0"] if self.m0 else [])
+                    + (["m"] if self.m else [])
+                    + [
+                        "average",
+                        "best",
+                    ]
+                )
+
+            results_writer.writerow(
+                [
+                    self.topology,
+                    self.number_of_islands,
+                    self.number_of_emigrants,
+                    self.migration_interval,
+                ]
+                + ([self.m0] if self.m0 else [])
+                + ([self.m] if self.m else [])
+                + [
+                    average,
+                    minimal,
+                ]
+            )
 
     # MAIN PART - GENETIC ALGORITHM STEP
     def step(self):

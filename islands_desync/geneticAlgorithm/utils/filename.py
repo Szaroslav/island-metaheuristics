@@ -66,6 +66,24 @@ class Filename:
             + str(ilumigr)
         )
 
+    @staticmethod
+    def get_csv_name(
+        topology: str,
+        island_count: int,
+        migrant_count: int,
+        m0: int | None = None,
+        m: int | None = None,
+    ) -> str:
+        return "-".join(
+            [
+                topology,
+                str(island_count),
+                str(migrant_count),
+            ]
+            + ([str(m0)] if m0 is not None else [])
+            + ([str(m)] if m is not None else [])
+        ) + ".csv"
+
     # def getshortpath(self, dta, problem):
     #    return "logs/"+str(dta)+"/"+problem
 

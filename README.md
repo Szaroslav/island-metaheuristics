@@ -24,4 +24,21 @@ TOPOLOGY="complete"
 STRATEGY="best"
 MIGRANT_COUNT=5
 MIGRATION_INTERVAL=5
+M0=5
+M=5
+```
+
+### Single Job
+
+```sh
+./start.sh
+```
+
+### Job Array
+
+To start a job array, generate a list of parameters (using the `params.sh` script) and set `ISLAND_COUNT` in `.env` to the maximum possible number of islands declared in the `params.txt` file.
+
+```sh
+./params.sh
+./start.sh array
 ```

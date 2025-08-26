@@ -12,7 +12,7 @@ class Controller:
 
     def endOfProcess(self, wyspa, co):
         self.ctrlFile = open(
-            self.katalog + "/kontrolW" + str(wyspa) + "End.ctrl.txt", "a"
+            self.katalog + "/kontrolW" + str(wyspa) + "End.ctrl.txt", "w"
         )
         self.ctrlFile.write(str(co))
         self.ctrlFile.close()
