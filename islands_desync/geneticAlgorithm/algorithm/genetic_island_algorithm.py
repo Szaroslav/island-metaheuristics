@@ -652,13 +652,15 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
             + " " * 7
         )
 
-        with open(os.path.join("logs", Filename.get_csv_name(
+        csv_path = os.path.join("logs", Filename.get_csv_name(
             self.topology,
             self.number_of_islands,
             self.number_of_emigrants,
             self.m0,
-            self.m
-        )), mode="a") as results_file:
+            self.m,
+        ))
+
+        with open(csv_path, mode="a") as results_file:
             results_writer = csv.writer(
                 results_file,
                 delimiter=",",
@@ -666,7 +668,7 @@ class GeneticIslandAlgorithm(GeneticAlgorithm):
                 quoting=csv.QUOTE_MINIMAL,
             )
 
-            if csv.reader(results_file).line_num == 0:
+            if not os.path.exists(csv_path):
                 results_writer.writerow(
                     [
                         "topology",
