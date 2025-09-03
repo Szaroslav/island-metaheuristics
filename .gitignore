@@ -140,3 +140,6 @@ dmypy.json
 /slurm/
 /slurm-*.out
 /params.txt
+
+# Result files
+/results/
